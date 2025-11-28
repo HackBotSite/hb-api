@@ -1,4 +1,15 @@
 export default function handler(req, res) {
+  // Tambahkan header CORS
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-api-key");
+
+  // Handle preflight request
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  // Data doa
   res.status(200).json({
     category: "Doa Harian",
     data: [
