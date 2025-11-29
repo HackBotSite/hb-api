@@ -1,4 +1,4 @@
-import fs from "fs";cc
+import fs from "fs";
 
 const apikeys = JSON.parse(
   fs.readFileSync(new URL("./apikey.json", import.meta.url))
