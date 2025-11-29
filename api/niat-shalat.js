@@ -87,7 +87,7 @@ export default function handler(req, res) {
         latin: "Ushallii sunnatal-haajati rak‘ataini lillāhi ta‘ālā",
         translation: "Aku niat shalat sunnah Hajat dua rakaat karena Allah Ta‘ala."
       },
-      istiqoroh: {
+      istikharah: {
         title: "Niat Shalat Istikharah",
         arabic: "أُصَلِّي سُنَّةَ الاِسْتِخَارَةِ رَكْعَتَيْنِ لِلّٰهِ تَعَالَى",
         latin: "Ushallii sunnatal-istikhārah rak‘ataini lillāhi ta‘ālā",
@@ -121,7 +121,7 @@ export default function handler(req, res) {
       });
     }
 
-    const result = niatShalat[shalatName];
+    const result = niatList[shalatName];
     if (!result) {
       return res.status(404).json({ error: `Niat shalat '${shalatName}' tidak ditemukan` });
     }
@@ -131,8 +131,8 @@ export default function handler(req, res) {
       name: shalatName,
       data: result
     });
-  } catch (err) {
-    console.error("Serverless error:", err);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+    } catch (err) {
+      console.error("Serverless error:", err);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
 }
