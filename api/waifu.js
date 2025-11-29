@@ -1,4 +1,8 @@
-import apikeys from "./apikey.json" assert { type: "json" };
+import fs from "fs";
+
+const apikeys = JSON.parse(
+  fs.readFileSync(new URL("./apikey.json", import.meta.url))
+);
 
 export default function handler(req, res) {
   // Tambahkan header CORS
