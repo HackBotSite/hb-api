@@ -1,4 +1,4 @@
-import apikeys from "./apikey.json" assert { type: "json" };
+import apikeys from "./apikey.json" with { type: "json" };
 
 export default function handler(req, res) {
   // Tambahkan header CORS
