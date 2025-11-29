@@ -15,7 +15,27 @@ export default function handler(req, res) {
     { status: true, result: "https://i.pinimg.com/1200x/e8/79/58/e879582d72e6d8a2e029bf5f8307d1fa.jpg" },
     { status: true, result: "https://i.pinimg.com/736x/a4/c2/16/a4c21667d48df99f83e0ebdf7d65cc9e.jpg" },
     { status: true, result: "https://i.pinimg.com/1200x/30/9d/35/309d356faa2a8f06f6ff9d396ea240d3.jpg" },
-    { status: true, result: "https://i.pinimg.com/1200x/02/d8/06/02d8062a24fd17295822fe850b7b8966.jpg" }
+    { status: true, result: "https://i.pinimg.com/1200x/02/d8/06/02d8062a24fd17295822fe850b7b8966.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/donghua/donghua1.png" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/donghua/donghua2.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/donghua/donghua3.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/donghua/donghua4.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/donghua/donghua5.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/donghua/donghua6.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/donghua/donghua7.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/donghua/donghua8.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/donghua/donghua9.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/donghua/donghua10.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/donghua/donghua11.png" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/donghua/donghua12.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/donghua/donghua13.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/donghua/donghua14.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/donghua/donghua15.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/donghua/donghua16.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/donghua/donghua17.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/donghua/donghua18.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/donghua/donghua19.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/donghua/donghua20.jpg" }
   ];
 
   // Ambil donghua random
