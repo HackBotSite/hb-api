@@ -1,6 +1,6 @@
 {
   "Hacksbotsrg": {
-    "allowedIps": ["123.45.67.89", "111.222.333.444"],
+    "allowedIps": ["216.198.79.1", "111.222.333.444"],
     "allowedDomains": ["https://teamhackbotsrg.my.id", "https://teamhackbotsindo.my.id"]
   },
   "TenantBKey": {
