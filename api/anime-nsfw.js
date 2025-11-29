@@ -12,7 +12,18 @@ export default function handler(req, res) {
     { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai2.jpg" },
     { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai3.jpg" },
     { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai4.jpg" },
-    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai5.jpg" }
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai5.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw1.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw2.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw3.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw4.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw5.jpg" }
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw6.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw7.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw8.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw9.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw10.jpg" },
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw11.jpg" }
   ];
 
   const randomNSFW = nsfwList[Math.floor(Math.random() * nsfwList.length)];
