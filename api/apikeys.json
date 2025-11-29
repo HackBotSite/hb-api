@@ -1,0 +1,14 @@
+{
+  "Hacksbotsrg": {
+    "allowedIps": ["123.45.67.89", "111.222.333.444"],
+    "allowedDomains": ["https://teamhackbotsrg.my.id"]
+  },
+  "TenantBKey": {
+    "allowedIps": ["98.76.54.32", "222.111.222.111"],
+    "allowedDomains": ["https://clientb.com"]
+  },
+  "TenantCKey": {
+    "allowedIps": ["10.20.30.40"],
+    "allowedDomains": ["https://clientc.net"]
+  }
+}
