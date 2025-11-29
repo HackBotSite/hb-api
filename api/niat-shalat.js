@@ -1,45 +1,38 @@
-import apikeys from "./apikeys.json" with { type: "json" };
+import apikeys from "./apikeys.json";
 
 export default function handler(req, res) {
   try {
-    // Tambahkan header CORS
+    // Header CORS
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-api-key");
 
-    // Handle preflight request
     if (req.method === "OPTIONS") {
       return res.status(200).end();
     }
 
     // Ambil API key & info client
     const clientKey = req.headers["x-api-key"];
-    const clientIp = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-    const clientOrigin = req.headers["origin"] || req.headers["referer"];
+    const clientIp = req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "";
+    const clientOrigin = req.headers["origin"] || req.headers["referer"] || "";
 
     // Validasi API key
     if (!clientKey || !apikeys[clientKey]) {
       return res.status(401).json({ error: "API key tidak valid" });
     }
 
-    // Ambil aturan dari apikey.json
     const { allowedIps = [], allowedDomains = [] } = apikeys[clientKey];
 
-    // Validasi IP
     if (allowedIps.length > 0 && !allowedIps.includes(clientIp)) {
       return res.status(403).json({ error: "IP tidak diizinkan untuk API key ini" });
     }
 
-    // Validasi Domain
     if (allowedDomains.length > 0 && !allowedDomains.includes(clientOrigin)) {
       return res.status(403).json({ error: "Domain tidak diizinkan untuk API key ini" });
     }
 
-    // Ambil query parameter
-    const { shalat } = req.query;
-
     // Data niat shalat
-    const niatList = {
+    const niatShalat = {
       subuh: {
         title: "Niat Shalat Subuh",
         arabic: "أُصَلِّي فَرْضَ الصُّبْحِ رَكْعَتَيْنِ مُسْتَقْبِلَ الْقِبْلَةِ أَدَاءً لِلّٰهِ تَعَالَى",
@@ -94,7 +87,7 @@ export default function handler(req, res) {
         latin: "Ushallii sunnatal-haajati rak‘ataini lillāhi ta‘ālā",
         translation: "Aku niat shalat sunnah Hajat dua rakaat karena Allah Ta‘ala."
       },
-      istiqoroh: {
+      istikharah: {
         title: "Niat Shalat Istikharah",
         arabic: "أُصَلِّي سُنَّةَ الاِسْتِخَارَةِ رَكْعَتَيْنِ لِلّٰهِ تَعَالَى",
         latin: "Ushallii sunnatal-istikhārah rak‘ataini lillāhi ta‘ālā",
@@ -108,17 +101,22 @@ export default function handler(req, res) {
       }
     };
 
-    // Cari niat berdasarkan query
-    const result = niatList[shalat?.toLowerCase()];
+    // Ambil query (misalnya ?dzuhur)
+    const queryKeys = Object.keys(req.query);
+    if (queryKeys.length === 0) {
+      return res.status(400).json({ error: "Query shalat harus diisi (dzuhur, ashar, magrib, isya, subuh)" });
+    }
+
+    const shalatName = queryKeys[0];
+    const result = niatShalat[shalatName];
 
     if (!result) {
-      return res.status(404).json({
-        error: "Niat shalat tidak ditemukan. Gunakan query ?shalat=subuh/dzuhur/ashar/magrib/isya/duha/tahajud/witir/hajat/istiqoroh/taubat"
-      });
+      return res.status(404).json({ error: `Niat shalat '${shalatName}' tidak ditemukan` });
     }
 
     res.status(200).json({
       category: "Niat Shalat",
+      name: shalatName,
       data: result
     });
   } catch (err) {
