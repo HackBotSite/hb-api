@@ -1,4 +1,8 @@
-import apikeys from "./apikey.json" assert { type: "json" };
+import fs from "fs";
+
+const apikeys = JSON.parse(
+  fs.readFileSync(new URL("./apikey.json", import.meta.url))
+);
 
 export default function handler(req, res) {
   // Tambahkan header CORS
@@ -21,6 +25,7 @@ export default function handler(req, res) {
     return res.status(401).json({ error: "API key tidak valid" });
   }
 
+  // Ambil aturan dari apikey.json
   const { allowedIps = [], allowedDomains = [] } = apikeys[clientKey];
 
   // Validasi IP
