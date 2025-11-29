@@ -32,7 +32,7 @@ export default function handler(req, res) {
     }
 
     // Data niat shalat
-    const niatShalat = {
+    const niatList = {
       subuh: {
         title: "Niat Shalat Subuh",
         arabic: "أُصَلِّي فَرْضَ الصُّبْحِ رَكْعَتَيْنِ مُسْتَقْبِلَ الْقِبْلَةِ أَدَاءً لِلّٰهِ تَعَالَى",
@@ -87,7 +87,7 @@ export default function handler(req, res) {
         latin: "Ushallii sunnatal-haajati rak‘ataini lillāhi ta‘ālā",
         translation: "Aku niat shalat sunnah Hajat dua rakaat karena Allah Ta‘ala."
       },
-      istikharah: {
+      istiqoroh: {
         title: "Niat Shalat Istikharah",
         arabic: "أُصَلِّي سُنَّةَ الاِسْتِخَارَةِ رَكْعَتَيْنِ لِلّٰهِ تَعَالَى",
         latin: "Ushallii sunnatal-istikhārah rak‘ataini lillāhi ta‘ālā",
@@ -101,15 +101,27 @@ export default function handler(req, res) {
       }
     };
 
-    // Ambil query (misalnya ?dzuhur)
-    const queryKeys = Object.keys(req.query);
-    if (queryKeys.length === 0) {
-      return res.status(400).json({ error: "Query shalat harus diisi (dzuhur, ashar, magrib, isya, subuh)" });
+    // Ambil query parameter (support dua format)
+    let shalatName = null;
+
+    if (req.query.shalat) {
+      // Format ?shalat=isya
+      shalatName = req.query.shalat.toLowerCase();
+    } else {
+      // Format ?isya
+      const queryKeys = Object.keys(req.query);
+      if (queryKeys.length > 0) {
+        shalatName = queryKeys[0].toLowerCase();
+      }
     }
 
-    const shalatName = queryKeys[0];
-    const result = niatShalat[shalatName];
+    if (!shalatName) {
+      return res.status(400).json({
+        error: "Query shalat harus diisi (contoh: ?shalat=isya atau ?isya)"
+      });
+    }
 
+    const result = niatShalat[shalatName];
     if (!result) {
       return res.status(404).json({ error: `Niat shalat '${shalatName}' tidak ditemukan` });
     }
