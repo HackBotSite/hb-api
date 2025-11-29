@@ -64,6 +64,42 @@ export default function handler(req, res) {
       arabic: "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ وَإِنَّا إِلَى رَبِّنَا لَمُنْقَلِبُونَ",
       latin: "Subhanalladzi sakhkhara lana hadza wa ma kunna lahu muqrinin wa inna ila rabbina lamunqalibun",
       translation: "Maha Suci Allah yang telah menundukkan semua ini bagi kami padahal kami sebelumnya tidak mampu menguasainya, dan sesungguhnya kami akan kembali kepada Tuhan kami."
+    },
+    {
+      title: "Doa Memakai Pakaian Baru",
+      arabic: "اللَّهُمَّ لَكَ الْحَمْدُ أَنْتَ كَسَوْتَنِيهِ أَسْأَلُكَ مِنْ خَيْرِهِ وَخَيْرِ مَا صُنِعَ لَهُ وَأَعُوذُ بِكَ مِنْ شَرِّهِ وَشَرِّ مَا صُنِعَ لَهُ",
+      latin: "Allahumma laka alhamdu anta kasautaniihi as’aluka min khairihi wa khairi ma shuni’a lahu wa a’udzu bika min sharrihi wa sharri ma shuni’a lahu",
+      translation: "Ya Allah, segala puji bagi-Mu yang telah memberi aku pakaian ini. Aku memohon kebaikan darinya dan dari tujuan dibuatnya, serta aku berlindung kepada-Mu dari keburukan darinya dan dari tujuan dibuatnya."
+    },
+    {
+      title: "Doa Masuk Pasar",
+      arabic: "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، يُحْيِي وَيُمِيتُ، وَهُوَ حَيٌّ لَا يَمُوتُ، بِيَدِهِ الْخَيْرُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+      latin: "La ilaha illallahu wahdahu la sharika lahu, lahul mulku walahul hamdu, yuhyi wa yumitu, wahuwa hayyun la yamutu, biyadihil khair, wahuwa ‘ala kulli shay’in qadir",
+      translation: "Tiada Tuhan selain Allah, tiada sekutu bagi-Nya. Milik-Nya kerajaan dan segala puji. Dia menghidupkan dan mematikan, Dia Maha Hidup dan tidak mati. Di tangan-Nya segala kebaikan, dan Dia Maha Kuasa atas segala sesuatu."
+    },
+    {
+      title: "Doa Ketika Hujan Turun",
+      arabic: "اللَّهُمَّ صَيِّبًا نَافِعًا",
+      latin: "Allahumma shayyiban naafi’an",
+      translation: "Ya Allah, jadikanlah hujan ini sebagai hujan yang bermanfaat."
+    },
+    {
+      title: "Doa Ketika Mendengar Petir",
+      arabic: "سُبْحَانَ الَّذِي يُسَبِّحُ الرَّعْدُ بِحَمْدِهِ وَالْمَلَائِكَةُ مِنْ خِيفَتِهِ",
+      latin: "Subhanalladzi yusabbihur ra’du bihamdihi wal malaaikatu min khifatihi",
+      translation: "Maha Suci Allah, yang petir bertasbih dengan memuji-Nya, dan para malaikat pun karena takut kepada-Nya."
+    },
+    {
+      title: "Doa Ketika Bercermin",
+      arabic: "اللَّهُمَّ كَمَا حَسَّنْتَ خَلْقِي فَحَسِّنْ خُلُقِي",
+      latin: "Allahumma kama hassanta khalqi fahassin khuluqi",
+      translation: "Ya Allah, sebagaimana Engkau telah memperindah ciptaanku, maka perindahlah akhlakku."
+    },
+    {
+      title: "Doa Ketika Marah",
+      arabic: "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ",
+      latin: "A’udzu billahi minasy-syaythanir-rajim",
+      translation: "Aku berlindung kepada Allah dari godaan setan yang terkutuk."
     }
   ];
 
