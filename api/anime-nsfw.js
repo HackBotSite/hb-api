@@ -17,7 +17,7 @@ export default function handler(req, res) {
     { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw2.jpg" },
     { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw3.jpg" },
     { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw4.jpg" },
-    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw5.jpg" }
+    { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw5.jpg" },
     { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw6.jpg" },
     { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw7.jpg" },
     { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw8.jpg" },
