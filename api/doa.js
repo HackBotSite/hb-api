@@ -1,4 +1,4 @@
-import apikeys from "./apikey.json";
+import apikeys from "./apikeys.json";
 
 export default function handler(req, res) {
   try {
