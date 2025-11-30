@@ -2,6 +2,7 @@ import fs from "fs";
 
 export default function handler(req, res) {
   try {
+    // CORS setup
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-api-key");
@@ -10,8 +11,16 @@ export default function handler(req, res) {
       return res.status(200).end();
     }
 
-    const apikeys = JSON.parse(fs.readFileSync("./apikeys.json", "utf-8"));
+    // Load apikeys.json
+    let apikeys = {};
+    try {
+      apikeys = JSON.parse(fs.readFileSync("./apikeys.json", "utf-8"));
+    } catch (e) {
+      console.error("Gagal load apikeys.json:", e);
+      return res.status(500).json({ error: "Config API key tidak ditemukan" });
+    }
 
+    // Validasi API key
     const clientKey = req.headers["x-api-key"];
     const clientIp = (req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "").replace(/^::ffff:/, "");
     const clientOrigin = req.headers["origin"] || req.headers["referer"] || "";
