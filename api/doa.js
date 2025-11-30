@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 
 export default function handler(req, res) {
   try {
@@ -11,10 +12,11 @@ export default function handler(req, res) {
       return res.status(200).end();
     }
 
-    // Load apikeys.json
+    // Load apikeys.json dengan path absolut
     let apikeys = {};
     try {
-      apikeys = JSON.parse(fs.readFileSync("./apikeys.json", "utf-8"));
+      const filePath = path.join(process.cwd(), "apikeys.json");
+      apikeys = JSON.parse(fs.readFileSync(filePath, "utf-8"));
     } catch (e) {
       console.error("Gagal load apikeys.json:", e);
       return res.status(500).json({ error: "Config API key tidak ditemukan" });
@@ -22,7 +24,9 @@ export default function handler(req, res) {
 
     // Validasi API key
     const clientKey = req.headers["x-api-key"];
-    const clientIp = (req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "").replace(/^::ffff:/, "");
+    const clientIp = (req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "")
+      .replace(/^::ffff:/, "")
+      .split(",")[0].trim();
     const clientOrigin = req.headers["origin"] || req.headers["referer"] || "";
     const originHost = clientOrigin.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
@@ -134,7 +138,6 @@ export default function handler(req, res) {
       }
     ];
 
-    // Ambil doa random
     const randomDoa = doaList[Math.floor(Math.random() * doaList.length)];
 
     res.status(200).json({
