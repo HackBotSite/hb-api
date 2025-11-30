@@ -15,7 +15,7 @@ export default function handler(req, res) {
     // Load apikeys.json dengan path absolut
     let apikeys = {};
     try {
-      const filePath = path.join(process.cwd(), "apikeys.json");
+      const filePath = path.join(process.cwd(), "api", "apikeys.json");
       apikeys = JSON.parse(fs.readFileSync(filePath, "utf-8"));
     } catch (e) {
       console.error("Gagal load apikeys.json:", e);
@@ -136,8 +136,10 @@ export default function handler(req, res) {
         latin: "A’udzu billahi minasy-syaythanir-rajim",
         translation: "Aku berlindung kepada Allah dari godaan setan yang terkutuk."
       }
+      // dst… tambahkan doa lain sesuai kebutuhan
     ];
 
+    // Ambil doa random
     const randomDoa = doaList[Math.floor(Math.random() * doaList.length)];
 
     res.status(200).json({
