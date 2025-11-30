@@ -1,5 +1,5 @@
 import translate from "@vitalets/google-translate-api";
-import apikeys from "../apikeys.json";
+import apikeys from "./apikeys.json";
 
 export default async function handler(req, res) {
   try {
