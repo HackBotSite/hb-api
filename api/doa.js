@@ -1,4 +1,4 @@
-import apikeys from "./apikeys.json";
+import fs from "fs";
 
 export default function handler(req, res) {
   try {
@@ -10,9 +10,12 @@ export default function handler(req, res) {
       return res.status(200).end();
     }
 
+    const apikeys = JSON.parse(fs.readFileSync("./apikeys.json", "utf-8"));
+
     const clientKey = req.headers["x-api-key"];
-    const clientIp = req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "";
+    const clientIp = (req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "").replace(/^::ffff:/, "");
     const clientOrigin = req.headers["origin"] || req.headers["referer"] || "";
+    const originHost = clientOrigin.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
     if (!clientKey || !apikeys[clientKey]) {
       return res.status(401).json({ error: "API key tidak valid" });
@@ -24,7 +27,7 @@ export default function handler(req, res) {
       return res.status(403).json({ error: "IP tidak diizinkan untuk API key ini" });
     }
 
-    if (allowedDomains.length > 0 && !allowedDomains.includes(clientOrigin)) {
+    if (allowedDomains.length > 0 && !allowedDomains.includes(originHost)) {
       return res.status(403).json({ error: "Domain tidak diizinkan untuk API key ini" });
     }
 
