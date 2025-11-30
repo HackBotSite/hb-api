@@ -1,4 +1,4 @@
-import translate from "@vitalets/google-translate-api";
+import { translate } from "@vitalets/google-translate-api";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const apikeys = require("./apikeys.json");
@@ -22,7 +22,7 @@ export default async function handler(req, res) {
       return res.status(403).json({ error: "IP tidak diizinkan", ip: clientIp });
     }
 
-    if (tenant.allowedDomains && !tenant.allowedDomains.includes(clientOrigin)) {
+    if (tenant.allowedDomains && clientOrigin && !tenant.allowedDomains.includes(clientOrigin)) {
       return res.status(403).json({ error: "Domain tidak diizinkan", origin: clientOrigin });
     }
 
