@@ -3,6 +3,10 @@ import fs from "fs";
 import path from "path";
 import fetch from "node-fetch"; // kalau Node 18+, bisa hapus import ini
 
+// Counter request per tenant per hari (demo in-memory)
+// Production: simpan di database/Redis/KV store
+const usageCounters = {};
+
 export default async function handler(req, res) {
   try {
     // CORS setup
@@ -31,6 +35,23 @@ export default async function handler(req, res) {
     const clientKey = req.headers["x-api-key"];
     if (!clientKey || !apikeys[clientKey]) {
       return res.status(401).json({ error: "API key tidak valid" });
+    }
+
+    const { plan = "basic", quota = 100 } = apikeys[clientKey];
+
+    // Hitung penggunaan quota per hari
+    const today = new Date().toISOString().split("T")[0];
+    const usageId = `${clientKey}-${today}`;
+    usageCounters[usageId] = (usageCounters[usageId] || 0) + 1;
+
+    if (quota !== "unlimited" && usageCounters[usageId] > quota) {
+      return res.status(429).json({
+        error: "Quota exceeded",
+        tenant: clientKey,
+        plan,
+        quota,
+        used: usageCounters[usageId]
+      });
     }
 
     // Ambil parameter handle
@@ -89,6 +110,9 @@ export default async function handler(req, res) {
     return res.status(200).json({
       feature: "Smule Profile",
       tenant: clientKey,
+      plan,
+      quota,
+      used: usageCounters[usageId],
       handle,
       result: detail
     });
