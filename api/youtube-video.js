@@ -2,7 +2,6 @@
 import fs from "fs";
 import path from "path";
 import fetch from "node-fetch"; // kalau Node 18+, bisa hapus import ini
-import ytdl from "ytdl-core";
 
 export default async function handler(req, res) {
   try {
@@ -28,26 +27,10 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Config API key tidak ditemukan" });
     }
 
-    // Validasi API key + domain/IP
+    // Validasi API key
     const clientKey = req.headers["x-api-key"];
-    const clientIp = (req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "")
-      .replace(/^::ffff:/, "")
-      .split(",")[0].trim();
-    const clientOrigin = req.headers["origin"] || req.headers["referer"] || "";
-    const originHost = clientOrigin.replace(/^https?:\/\//, "").replace(/\/$/, "");
-
     if (!clientKey || !apikeys[clientKey]) {
       return res.status(401).json({ error: "API key tidak valid" });
-    }
-
-    const { allowedIps = [], allowedDomains = [] } = apikeys[clientKey];
-
-    if (allowedIps.length > 0 && !allowedIps.includes(clientIp)) {
-      return res.status(403).json({ error: "IP tidak diizinkan untuk API key ini", ip: clientIp });
-    }
-
-    if (allowedDomains.length > 0 && !allowedDomains.includes(originHost)) {
-      return res.status(403).json({ error: "Domain tidak diizinkan untuk API key ini", origin: originHost });
     }
 
     // Ambil parameter link
@@ -74,8 +57,9 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Tidak bisa ekstrak videoId dari link" });
     }
 
-    // Ambil metadata dari YouTube Data API
+    // API key YouTube
     const YOUTUBE_API_KEY = "AIzaSyABJ2vP5K61m1xx9V27U4vXp0d3dSkselc";
+
     const params = new URLSearchParams({
       key: YOUTUBE_API_KEY,
       part: "snippet,contentDetails,statistics",
@@ -89,18 +73,11 @@ export default async function handler(req, res) {
       return res.status(resp.status).json({ error: "YouTube API error", details: text });
     }
     const data = await resp.json();
+
     const item = (data.items || [])[0];
     if (!item) {
       return res.status(404).json({ error: "Video tidak ditemukan" });
     }
-
-    // Ambil format download dari ytdl-core
-    const info = await ytdl.getInfo(videoId);
-    const formats = info.formats.map(f => ({
-      quality: f.qualityLabel,
-      mimeType: f.mimeType,
-      url: f.url
-    }));
 
     const detail = {
       title: item.snippet?.title,
@@ -112,8 +89,7 @@ export default async function handler(req, res) {
       viewCount: item.statistics?.viewCount,
       likeCount: item.statistics?.likeCount,
       commentCount: item.statistics?.commentCount,
-      url: `https://www.youtube.com/watch?v=${videoId}`,
-      downloads: formats
+      url: `https://www.youtube.com/watch?v=${videoId}`
     };
 
     res.setHeader("Cache-Control", "public, max-age=60");
