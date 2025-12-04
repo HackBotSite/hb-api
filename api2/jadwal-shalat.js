@@ -2,6 +2,10 @@ import fs from "fs";
 import path from "path";
 import fetch from "node-fetch";
 
+// Simpan counter request sementara di memory (untuk demo)
+// Production: pakai database / Redis / KV store
+const usageCounters = {};
+
 export async function handler(event, context) {
   try {
     // Load apikeys.json dari folder api
@@ -19,22 +23,28 @@ export async function handler(event, context) {
 
     // Validasi API key
     const clientKey = event.headers["x-api-key"];
-    const clientIp = (event.headers["x-forwarded-for"] || "").split(",")[0].trim();
-    const clientOrigin = event.headers["origin"] || event.headers["referer"] || "";
-    const originHost = clientOrigin.replace(/^https?:\/\//, "").replace(/\/$/, "");
-
     if (!clientKey || !apikeys[clientKey]) {
       return { statusCode: 401, body: JSON.stringify({ error: "API key tidak valid" }) };
     }
 
-    const { allowedIps = [], allowedDomains = [] } = apikeys[clientKey];
+    const { plan = "basic", quota = 100 } = apikeys[clientKey];
 
-    if (allowedIps.length > 0 && !allowedIps.includes(clientIp)) {
-      return { statusCode: 403, body: JSON.stringify({ error: "IP tidak diizinkan untuk API key ini" }) };
-    }
+    // Hitung penggunaan quota (demo: in-memory counter)
+    const today = new Date().toISOString().split("T")[0];
+    const keyUsageId = `${clientKey}-${today}`;
+    usageCounters[keyUsageId] = (usageCounters[keyUsageId] || 0) + 1;
 
-    if (allowedDomains.length > 0 && !allowedDomains.includes(originHost)) {
-      return { statusCode: 403, body: JSON.stringify({ error: "Domain tidak diizinkan untuk API key ini" }) };
+    if (quota !== "unlimited" && usageCounters[keyUsageId] > quota) {
+      return {
+        statusCode: 429,
+        body: JSON.stringify({
+          error: "Quota exceeded",
+          tenant: clientKey,
+          plan,
+          quota,
+          used: usageCounters[keyUsageId]
+        })
+      };
     }
 
     // Ambil parameter city (default jakarta)
@@ -75,6 +85,9 @@ export async function handler(event, context) {
       body: JSON.stringify({
         feature: "Jadwal Shalat",
         tenant: clientKey,
+        plan,
+        quota,
+        used: usageCounters[keyUsageId],
         city,
         hari,
         tanggal,
