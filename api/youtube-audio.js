@@ -72,7 +72,7 @@ export default async function handler(req, res) {
     if (!videoId) return res.status(400).json({ error: "Tidak bisa ekstrak videoId dari link" });
 
     // --- Ambil metadata dari YouTube Data API ---
-    const YOUTUBE_API_KEY = "YOUR_YOUTUBE_DATA_API_KEY"; // ganti dengan API key YouTube Data API v3
+    const YOUTUBE_API_KEY = "IzaSyABJ2vP5K61m1xx9V27U4vXp0d3dSkselc"; // ganti dengan API key YouTube Data API v3
     const params = new URLSearchParams({
       key: YOUTUBE_API_KEY,
       part: "snippet,contentDetails",
