@@ -1,33 +1,52 @@
 // api/youtube-list.js
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-const apikeys = require("./apikeys.json");
+import fs from "fs";
+import path from "path";
+import fetch from "node-fetch"; // kalau Node 18+, bisa hapus import ini
 
 export default async function handler(req, res) {
   try {
-    // CORS
+    // CORS setup
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-api-key");
 
-    if (req.method === "OPTIONS") return res.status(200).end();
-    if (req.method !== "GET") return res.status(405).json({ error: "Method Not Allowed" });
-
-    // Validasi API key tenant
-    const clientKey = req.headers["x-api-key"];
-    const clientIp = req.headers["x-forwarded-for"]?.split(",")[0]?.trim();
-    const clientOrigin = req.headers.origin || "";
-
-    const tenant = apikeys[clientKey];
-    if (!tenant) return res.status(401).json({ error: "API key tidak valid" });
-
-    if (tenant.allowedIps?.length && !tenant.allowedIps.includes(clientIp)) {
-      return res.status(403).json({ error: "IP tidak diizinkan", ip: clientIp });
+    if (req.method === "OPTIONS") {
+      return res.status(200).end();
+    }
+    if (req.method !== "GET") {
+      return res.status(405).json({ error: "Method Not Allowed" });
     }
 
+    // Load apikeys.json
+    let apikeys = {};
+    try {
+      const filePath = path.join(process.cwd(), "api", "apikeys.json");
+      apikeys = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    } catch (e) {
+      console.error("Gagal load apikeys.json:", e);
+      return res.status(500).json({ error: "Config API key tidak ditemukan" });
+    }
+
+    // Validasi API key
+    const clientKey = req.headers["x-api-key"];
+    const clientIp = (req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "")
+      .replace(/^::ffff:/, "")
+      .split(",")[0].trim();
+    const clientOrigin = req.headers["origin"] || req.headers["referer"] || "";
     const originHost = clientOrigin.replace(/^https?:\/\//, "").replace(/\/$/, "");
-    if (tenant.allowedDomains?.length && !tenant.allowedDomains.includes(originHost)) {
-      return res.status(403).json({ error: "Domain tidak diizinkan", origin: originHost });
+
+    if (!clientKey || !apikeys[clientKey]) {
+      return res.status(401).json({ error: "API key tidak valid" });
+    }
+
+    const { allowedIps = [], allowedDomains = [] } = apikeys[clientKey];
+
+    if (allowedIps.length > 0 && !allowedIps.includes(clientIp)) {
+      return res.status(403).json({ error: "IP tidak diizinkan untuk API key ini", ip: clientIp });
+    }
+
+    if (allowedDomains.length > 0 && !allowedDomains.includes(originHost)) {
+      return res.status(403).json({ error: "Domain tidak diizinkan untuk API key ini", origin: originHost });
     }
 
     // Ambil query pencarian
@@ -44,7 +63,7 @@ export default async function handler(req, res) {
       key: YOUTUBE_API_KEY,
       part: "snippet",
       type: "video",
-      maxResults: "10",
+      maxResults: "5",
       q: query,
       regionCode: "ID"
     });
@@ -57,24 +76,14 @@ export default async function handler(req, res) {
     }
     const data = await resp.json();
 
-    const list = (data.items || [])
-      .filter(item => item.id?.videoId)
-      .map(item => {
-        const vid = item.id.videoId;
-        const sn = item.snippet || {};
-        return {
-          title: sn.title || "",
-          channelTitle: sn.channelTitle || "",
-          publishedAt: sn.publishedAt || "",
-          videoId: vid,
-          url: `https://www.youtube.com/watch?v=${vid}`,
-          thumbnails: {
-            default: sn.thumbnails?.default?.url || null,
-            medium: sn.thumbnails?.medium?.url || null,
-            high: sn.thumbnails?.high?.url || null,
-          },
-        };
-      });
+    const list = (data.items || []).map(item => ({
+      title: item.snippet?.title,
+      channelTitle: item.snippet?.channelTitle,
+      publishedAt: item.snippet?.publishedAt,
+      videoId: item.id?.videoId,
+      url: `https://www.youtube.com/watch?v=${item.id?.videoId}`,
+      thumbnails: item.snippet?.thumbnails
+    }));
 
     res.setHeader("Cache-Control", "public, max-age=60");
     return res.status(200).json({
@@ -82,7 +91,7 @@ export default async function handler(req, res) {
       tenant: clientKey,
       query,
       total: list.length,
-      results: list,
+      results: list
     });
   } catch (err) {
     console.error("Youtube List error:", err);
