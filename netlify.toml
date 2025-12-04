@@ -1,5 +1,5 @@
 [build]
-  functions = "api/api2"   # sesuai lokasi jadwal-shalat.js
+  functions = "api2"   # sesuai lokasi jadwal-shalat.js
 
 [[redirects]]
   from = "/api/*"
