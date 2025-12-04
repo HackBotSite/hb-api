@@ -2,10 +2,11 @@
 import fs from "fs";
 import path from "path";
 import fetch from "node-fetch"; // kalau Node 18+, bisa hapus import ini
+import ytdl from "ytdl-core";
 
 export default async function handler(req, res) {
   try {
-    // --- CORS setup ---
+    // CORS setup
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-api-key");
@@ -17,7 +18,7 @@ export default async function handler(req, res) {
       return res.status(405).json({ error: "Method Not Allowed" });
     }
 
-    // --- Load apikeys.json ---
+    // Load apikeys.json
     let apikeys = {};
     try {
       const filePath = path.join(process.cwd(), "api", "apikeys.json");
@@ -27,7 +28,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Config API key tidak ditemukan" });
     }
 
-    // --- Validasi API key + domain/IP ---
+    // Validasi API key + domain/IP
     const clientKey = req.headers["x-api-key"];
     const clientIp = (req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "")
       .replace(/^::ffff:/, "")
@@ -40,21 +41,23 @@ export default async function handler(req, res) {
     }
 
     const { allowedIps = [], allowedDomains = [] } = apikeys[clientKey];
+
     if (allowedIps.length > 0 && !allowedIps.includes(clientIp)) {
       return res.status(403).json({ error: "IP tidak diizinkan untuk API key ini", ip: clientIp });
     }
+
     if (allowedDomains.length > 0 && !allowedDomains.includes(originHost)) {
       return res.status(403).json({ error: "Domain tidak diizinkan untuk API key ini", origin: originHost });
     }
 
-    // --- Ambil parameter link ---
+    // Ambil parameter link
     const urlObj = new URL(req.url, `http://${req.headers.host}`);
     const link = urlObj.searchParams.get("link");
     if (!link || !String(link).trim()) {
       return res.status(400).json({ error: "Parameter ?link wajib diisi" });
     }
 
-    // --- Ekstrak videoId dari link YouTube ---
+    // Ekstrak videoId dari link YouTube
     let videoId = "";
     try {
       const parsed = new URL(link);
@@ -66,12 +69,13 @@ export default async function handler(req, res) {
     } catch (e) {
       return res.status(400).json({ error: "Link YouTube tidak valid" });
     }
+
     if (!videoId) {
       return res.status(400).json({ error: "Tidak bisa ekstrak videoId dari link" });
     }
 
-    // --- Ambil metadata dari YouTube Data API ---
-    const YOUTUBE_API_KEY = "YOUR_YOUTUBE_API_KEY"; // ganti dengan API key YouTube Data API v3
+    // Ambil metadata dari YouTube Data API
+    const YOUTUBE_API_KEY = "AIzaSyABJ2vP5K61m1xx9V27U4vXp0d3dSkselc";
     const params = new URLSearchParams({
       key: YOUTUBE_API_KEY,
       part: "snippet,contentDetails,statistics",
@@ -90,7 +94,14 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: "Video tidak ditemukan" });
     }
 
-    // --- Susun detail response ---
+    // Ambil format download dari ytdl-core
+    const info = await ytdl.getInfo(videoId);
+    const formats = info.formats.map(f => ({
+      quality: f.qualityLabel,
+      mimeType: f.mimeType,
+      url: f.url
+    }));
+
     const detail = {
       title: item.snippet?.title,
       description: item.snippet?.description,
@@ -101,9 +112,8 @@ export default async function handler(req, res) {
       viewCount: item.statistics?.viewCount,
       likeCount: item.statistics?.likeCount,
       commentCount: item.statistics?.commentCount,
-      // URL resmi video YouTube (bisa diputar/embed, bukan direct download)
-      videoUrl: `https://www.youtube.com/watch?v=${videoId}`,
-      embedUrl: `https://www.youtube.com/embed/${videoId}`
+      url: `https://www.youtube.com/watch?v=${videoId}`,
+      downloads: formats
     };
 
     res.setHeader("Cache-Control", "public, max-age=60");
