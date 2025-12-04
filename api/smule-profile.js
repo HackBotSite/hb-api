@@ -5,15 +5,19 @@ import fetch from "node-fetch"; // kalau Node 18+, bisa hapus import ini
 
 export default async function handler(req, res) {
   try {
-    // --- CORS setup ---
+    // CORS setup
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-api-key");
 
-    if (req.method === "OPTIONS") return res.status(200).end();
-    if (req.method !== "GET") return res.status(405).json({ error: "Method Not Allowed" });
+    if (req.method === "OPTIONS") {
+      return res.status(200).end();
+    }
+    if (req.method !== "GET") {
+      return res.status(405).json({ error: "Method Not Allowed" });
+    }
 
-    // --- Load apikeys.json ---
+    // Load apikeys.json
     let apikeys = {};
     try {
       const filePath = path.join(process.cwd(), "api", "apikeys.json");
@@ -23,27 +27,13 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Config API key tidak ditemukan" });
     }
 
-    // --- Validasi API key + domain/IP ---
+    // Validasi API key
     const clientKey = req.headers["x-api-key"];
-    const clientIp = (req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "")
-      .replace(/^::ffff:/, "")
-      .split(",")[0].trim();
-    const clientOrigin = req.headers["origin"] || req.headers["referer"] || "";
-    const originHost = clientOrigin.replace(/^https?:\/\//, "").replace(/\/$/, "");
-
     if (!clientKey || !apikeys[clientKey]) {
       return res.status(401).json({ error: "API key tidak valid" });
     }
 
-    const { allowedIps = [], allowedDomains = [] } = apikeys[clientKey];
-    if (allowedIps.length > 0 && !allowedIps.includes(clientIp)) {
-      return res.status(403).json({ error: "IP tidak diizinkan untuk API key ini", ip: clientIp });
-    }
-    if (allowedDomains.length > 0 && !allowedDomains.includes(originHost)) {
-      return res.status(403).json({ error: "Domain tidak diizinkan untuk API key ini", origin: originHost });
-    }
-
-    // --- Ambil parameter handle ---
+    // Ambil parameter handle
     const urlObj = new URL(req.url, `http://${req.headers.host}`);
     const handle = urlObj.searchParams.get("handle");
     if (!handle || !String(handle).trim()) {
@@ -55,7 +45,7 @@ export default async function handler(req, res) {
       "Accept": "application/json"
     };
 
-    // --- Ambil data profil ---
+    // Ambil data profil
     const profileRes = await fetch(`https://www.smule.com/api/profile?handle=${handle}`, { headers });
     if (!profileRes.ok) {
       const text = await profileRes.text();
@@ -66,7 +56,7 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: "Akun Smule tidak ditemukan" });
     }
 
-    // --- Ambil 3 rekaman terbaru ---
+    // Ambil 3 rekaman terbaru
     const perfRes = await fetch(`https://www.smule.com/${handle}/performances/json?offset=0`, { headers });
     if (!perfRes.ok) {
       const text = await perfRes.text();
@@ -75,7 +65,7 @@ export default async function handler(req, res) {
     const perfData = await perfRes.json();
     const performances = (perfData.list || []).slice(0, 3);
 
-    // --- Bangun response gabungan profil + recordings ---
+    // Susun detail response
     const detail = {
       avatar: profileData.pic_url || "",
       username: profileData.handle || "-",
