@@ -1,7 +1,7 @@
 {
   "Hackbotsrg": {
-    "allowedIps": ["202.145.10.217", "216.198.79.1", "111.222.333.444", "202.145.10.220", "2404:e100:6:7396:41a3:4ee9:5474:f297", "192.168.101.2", "rad-kringle-2bde58.netlify.app"],
-    "allowedDomains": ["teamhackbotsrg.my.id", "teamhackbotsindo.my.id"]
+    "allowedIps": [],
+    "allowedDomains": ["teamhackbotsrg.my.id", "teamhackbotsindo.my.id", "rad-kringle-2bde58.netlify.app"]
   },
   "TenantBKey": {
     "allowedIps": ["98.76.54.32", "222.111.222.111"],
