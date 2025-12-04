@@ -1,14 +1,11 @@
 {
   "Hackbotsrg": {
-    "allowedIps": [],
-    "allowedDomains": ["teamhackbotsrg.my.id", "teamhackbotsindo.my.id", "rad-kringle-2bde58.netlify.app"]
+    "owner": "Rega"
   },
   "TenantBKey": {
-    "allowedIps": ["98.76.54.32", "222.111.222.111"],
-    "allowedDomains": ["https://clientb.com"]
+    "owner": "Client B"
   },
   "TenantCKey": {
-    "allowedIps": ["10.20.30.40"],
-    "allowedDomains": ["https://clientc.net"]
+    "owner": "Client C"
   }
 }
