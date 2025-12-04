@@ -2,8 +2,8 @@ import fs from "fs";
 import path from "path";
 import fetch from "node-fetch";
 
-// Simpan counter request sementara di memory (untuk demo)
-// Production: pakai database / Redis / KV store
+// Counter request per tenant per hari (demo in-memory)
+// Production: simpan di database/Redis/KV store
 const usageCounters = {};
 
 export async function handler(event, context) {
@@ -29,12 +29,12 @@ export async function handler(event, context) {
 
     const { plan = "basic", quota = 100 } = apikeys[clientKey];
 
-    // Hitung penggunaan quota (demo: in-memory counter)
+    // Hitung penggunaan quota per hari
     const today = new Date().toISOString().split("T")[0];
-    const keyUsageId = `${clientKey}-${today}`;
-    usageCounters[keyUsageId] = (usageCounters[keyUsageId] || 0) + 1;
+    const usageId = `${clientKey}-${today}`;
+    usageCounters[usageId] = (usageCounters[usageId] || 0) + 1;
 
-    if (quota !== "unlimited" && usageCounters[keyUsageId] > quota) {
+    if (quota !== "unlimited" && usageCounters[usageId] > quota) {
       return {
         statusCode: 429,
         body: JSON.stringify({
@@ -42,7 +42,7 @@ export async function handler(event, context) {
           tenant: clientKey,
           plan,
           quota,
-          used: usageCounters[keyUsageId]
+          used: usageCounters[usageId]
         })
       };
     }
@@ -87,7 +87,7 @@ export async function handler(event, context) {
         tenant: clientKey,
         plan,
         quota,
-        used: usageCounters[keyUsageId],
+        used: usageCounters[usageId],
         city,
         hari,
         tanggal,
