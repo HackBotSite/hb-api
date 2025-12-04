@@ -3,6 +3,10 @@ import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const apikeys = require("./apikeys.json");
 
+// Counter request per tenant per hari (demo in-memory)
+// Production: simpan di database/Redis/KV store
+const usageCounters = {};
+
 export default async function handler(req, res) {
   try {
     // CORS
@@ -11,23 +15,28 @@ export default async function handler(req, res) {
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-api-key");
 
     if (req.method === "OPTIONS") return res.status(200).end();
+    if (req.method !== "GET") return res.status(405).json({ error: "Method Not Allowed" });
 
     // Validasi API key
     const clientKey = req.headers["x-api-key"];
-    const clientIp = req.headers["x-forwarded-for"]?.split(",")[0]?.trim();
-    const clientOrigin = req.headers.origin || "";
-
     const tenant = apikeys[clientKey];
     if (!tenant) return res.status(401).json({ error: "API key tidak valid" });
 
-    if (tenant.allowedIps?.length && !tenant.allowedIps.includes(clientIp)) {
-      return res.status(403).json({ error: "IP tidak diizinkan", ip: clientIp });
-    }
+    const { plan = "basic", quota = 100 } = tenant;
 
-    // Normalisasi domain
-    const originHost = clientOrigin.replace(/^https?:\/\//, "").replace(/\/$/, "");
-    if (tenant.allowedDomains?.length && !tenant.allowedDomains.includes(originHost)) {
-      return res.status(403).json({ error: "Domain tidak diizinkan", origin: originHost });
+    // Hitung penggunaan quota per hari
+    const today = new Date().toISOString().split("T")[0];
+    const usageId = `${clientKey}-${today}`;
+    usageCounters[usageId] = (usageCounters[usageId] || 0) + 1;
+
+    if (quota !== "unlimited" && usageCounters[usageId] > quota) {
+      return res.status(429).json({
+        error: "Quota exceeded",
+        tenant: clientKey,
+        plan,
+        quota,
+        used: usageCounters[usageId]
+      });
     }
 
     // Ambil query
@@ -42,15 +51,18 @@ export default async function handler(req, res) {
     // Translate
     const result = await translate(text, { to });
 
-    res.status(200).json({
+    return res.status(200).json({
       feature: "Translate",
       tenant: clientKey,
+      plan,
+      quota,
+      used: usageCounters[usageId],
       input: text,
       targetLang: to,
       result: result.text
     });
   } catch (err) {
     console.error("Translate error:", err);
-    res.status(500).json({ error: "Internal Server Error", detail: err.message });
+    return res.status(500).json({ error: "Internal Server Error", detail: err.message });
   }
 }
