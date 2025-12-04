@@ -1,11 +1,22 @@
 {
-  "HackRega": {
-    "owner": "Rega"
+  "Hackbotsrg": {
+    "plan": "premium",
+    "owner": "Thousand",
+    "notes": "Tenant utama dengan akses penuh"
   },
   "TenantBKey": {
-    "owner": "Client B"
+    "plan": "basic",
+    "owner": "Client B",
+    "notes": "Tenant dengan limitasi request harian"
   },
   "TenantCKey": {
-    "owner": "Client C"
+    "plan": "enterprise",
+    "owner": "Client C",
+    "notes": "Tenant corporate dengan SLA khusus"
+  },
+  "TenantDKey": {
+    "plan": "trial",
+    "owner": "Client D",
+    "notes": "Tenant baru dengan akses terbatas"
   }
 }
