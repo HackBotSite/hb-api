@@ -1,6 +1,10 @@
 import fs from "fs";
 import path from "path";
 
+// Counter request per tenant per hari (demo in-memory)
+// Production: simpan di database/Redis/KV store
+const usageCounters = {};
+
 export default function handler(req, res) {
   try {
     // CORS setup
@@ -12,7 +16,7 @@ export default function handler(req, res) {
       return res.status(200).end();
     }
 
-    // Load apikeys.json dengan path absolut
+    // Load apikeys.json
     let apikeys = {};
     try {
       const filePath = path.join(process.cwd(), "api", "apikeys.json");
@@ -24,26 +28,28 @@ export default function handler(req, res) {
 
     // Validasi API key
     const clientKey = req.headers["x-api-key"];
-    const clientIp = (req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "")
-      .replace(/^::ffff:/, "")
-      .split(",")[0].trim();
-    const clientOrigin = req.headers["origin"] || req.headers["referer"] || "";
-    const originHost = clientOrigin.replace(/^https?:\/\//, "").replace(/\/$/, "");
-
     if (!clientKey || !apikeys[clientKey]) {
       return res.status(401).json({ error: "API key tidak valid" });
     }
 
-    const { allowedIps = [], allowedDomains = [] } = apikeys[clientKey];
+    const { plan = "basic", quota = 100 } = apikeys[clientKey];
 
-    if (allowedIps.length > 0 && !allowedIps.includes(clientIp)) {
-      return res.status(403).json({ error: "IP tidak diizinkan untuk API key ini" });
+    // Hitung penggunaan quota per hari
+    const today = new Date().toISOString().split("T")[0];
+    const usageId = `${clientKey}-${today}`;
+    usageCounters[usageId] = (usageCounters[usageId] || 0) + 1;
+
+    if (quota !== "unlimited" && usageCounters[usageId] > quota) {
+      return res.status(429).json({
+        error: "Quota exceeded",
+        tenant: clientKey,
+        plan,
+        quota,
+        used: usageCounters[usageId]
+      });
     }
 
-    if (allowedDomains.length > 0 && !allowedDomains.includes(originHost)) {
-      return res.status(403).json({ error: "Domain tidak diizinkan untuk API key ini" });
-    }
-
+    // Data Anime (contoh statis)
     const animeList = [
       { status: true, result: "https://img.freepik.com/free-photo/anime-style-mythical-dragon-creature_23-2151112778.jpg" },
       { status: true, result: "https://cdn.kibrispdr.org/data/872/wallpaper-anime-hd-android-xiaomi-3.jpg" },
@@ -54,12 +60,16 @@ export default function handler(req, res) {
 
     const randomAnime = animeList[Math.floor(Math.random() * animeList.length)];
 
-    res.status(200).json({
+    return res.status(200).json({
       category: "Anime Random",
+      tenant: clientKey,
+      plan,
+      quota,
+      used: usageCounters[usageId],
       data: randomAnime
     });
   } catch (err) {
     console.error("Serverless error:", err);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error", detail: err.message });
   }
 }
