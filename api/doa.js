@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-// Counter request per tenant per hari (demo in-memory)
+// Counter request per apikey per hari (demo in-memory)
 // Production: simpan di database/Redis/KV store
 const usageCounters = {};
 
@@ -42,7 +42,7 @@ export default function handler(req, res) {
     if (quota !== "unlimited" && usageCounters[usageId] > quota) {
       return res.status(429).json({
         error: "Quota exceeded",
-        tenant: clientKey,
+        apikey: clientKey,
         plan,
         quota,
         used: usageCounters[usageId]
@@ -149,7 +149,7 @@ export default function handler(req, res) {
 
     return res.status(200).json({
       category: "Doa Harian",
-      tenant: clientKey,
+      apikey: clientKey,
       plan,
       quota,
       used: usageCounters[usageId],
