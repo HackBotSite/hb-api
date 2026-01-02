@@ -42,7 +42,7 @@ export default function handler(req, res) {
     if (quota !== "unlimited" && usageCounters[usageId] > quota) {
       return res.status(429).json({
         error: "Quota exceeded",
-        tenant: clientKey,
+        apikey: clientKey,
         plan,
         quota,
         used: usageCounters[usageId]
@@ -62,7 +62,7 @@ export default function handler(req, res) {
 
     return res.status(200).json({
       category: "Anime Random",
-      tenant: clientKey,
+      apikey: clientKey,
       plan,
       quota,
       used: usageCounters[usageId],
