@@ -3,7 +3,7 @@ import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const apikeys = require("./apikeys.json");
 
-// Counter request per tenant per hari (demo in-memory)
+// Counter request per apikey per hari (demo in-memory)
 // Production: simpan di database/Redis/KV store
 const usageCounters = {};
 
@@ -19,10 +19,10 @@ export default async function handler(req, res) {
 
     // Validasi API key
     const clientKey = req.headers["x-api-key"];
-    const tenant = apikeys[clientKey];
-    if (!tenant) return res.status(401).json({ error: "API key tidak valid" });
+    const apikey = apikeys[clientKey];
+    if (!apikey) return res.status(401).json({ error: "API key tidak valid" });
 
-    const { plan = "basic", quota = 100 } = tenant;
+    const { plan = "basic", quota = 100 } = apikey;
 
     // Hitung penggunaan quota per hari
     const today = new Date().toISOString().split("T")[0];
@@ -32,7 +32,7 @@ export default async function handler(req, res) {
     if (quota !== "unlimited" && usageCounters[usageId] > quota) {
       return res.status(429).json({
         error: "Quota exceeded",
-        tenant: clientKey,
+        apikey: clientKey,
         plan,
         quota,
         used: usageCounters[usageId]
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       feature: "Translate",
-      tenant: clientKey,
+      apikey: clientKey,
       plan,
       quota,
       used: usageCounters[usageId],
