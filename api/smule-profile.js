@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import fetch from "node-fetch"; // kalau Node 18+, bisa hapus import ini
 
-// Counter request per tenant per hari (demo in-memory)
+// Counter request per apikey per hari (demo in-memory)
 // Production: simpan di database/Redis/KV store
 const usageCounters = {};
 
@@ -47,7 +47,7 @@ export default async function handler(req, res) {
     if (quota !== "unlimited" && usageCounters[usageId] > quota) {
       return res.status(429).json({
         error: "Quota exceeded",
-        tenant: clientKey,
+        apikey: clientKey,
         plan,
         quota,
         used: usageCounters[usageId]
@@ -109,7 +109,7 @@ export default async function handler(req, res) {
     res.setHeader("Cache-Control", "public, max-age=60");
     return res.status(200).json({
       feature: "Smule Profile",
-      tenant: clientKey,
+      apikey: clientKey,
       plan,
       quota,
       used: usageCounters[usageId],
