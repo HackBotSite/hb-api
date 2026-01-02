@@ -2,25 +2,25 @@
   "HackRega": {
     "plan": "premium",
     "owner": "Thousand",
-    "notes": "Tenant utama dengan akses penuh",
+    "notes": "Apikey utama dengan akses penuh",
     "quota": "unlimited"
   },
-  "TenantBKey": {
+  "ApikeyBKey": {
     "plan": "basic",
     "owner": "Client B",
-    "notes": "Tenant dengan limitasi request harian",
+    "notes": "Apikey dengan limitasi request harian",
     "quota": 1000
   },
-  "TenantCKey": {
+  "ApikeyCKey": {
     "plan": "enterprise",
     "owner": "Client C",
-    "notes": "Tenant corporate dengan SLA khusus",
+    "notes": "Apikey corporate dengan SLA khusus",
     "quota": 5000
   },
-  "TenantDKey": {
+  "rega123": {
     "plan": "trial",
-    "owner": "Client D",
-    "notes": "Tenant baru dengan akses terbatas",
-    "quota": 50
+    "owner": "regatrial",
+    "notes": "Apikey baru dengan akses terbatas",
+    "quota": 100
   }
 }
