@@ -5,9 +5,9 @@
     "notes": "Apikey utama dengan akses penuh",
     "quota": "unlimited"
   },
-  "ApikeyBKey": {
+  "hbtrial": {
     "plan": "basic",
-    "owner": "Client B",
+    "owner": "Hb-Trial",
     "notes": "Apikey dengan limitasi request harian",
     "quota": 1000
   },
