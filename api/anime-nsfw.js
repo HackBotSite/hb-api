@@ -1,1 +1,100 @@
+import fs from "fs";
+import path from "path";
 
+// counter request per tenant per hari (demo in-memory)
+// production: simpan di database/Redis/KV store
+const usageCounters = {};
+
+export default function handler(req, res) {
+  try {
+    // CORS setup
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-api-key");
+
+    if (req.method === "OPTIONS") {
+      return res.status(200).end();
+    }
+
+    // Load apikeys.json
+    let apikeys = {};
+    try {
+      const filePath = path.join(process.cwd(), "api", "apikeys.json");
+      apikeys = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    } catch (e) {
+      console.error("Gagal load apikeys.json:", e);
+      return res.status(500).json({ error: "Config API key tidak ditemukan" });
+    }
+
+    // Validasi API key
+    const clientKey = req.headers["x-api-key"];
+    if (!clientKey || !apikeys[clientKey]) {
+      return res.status(401).json({ error: "API key tidak valid" });
+    }
+
+    const { plan = "basic", quota = 100 } = apikeys[clientKey];
+
+    // Hitung penggunaan quota per hari
+    const today = new Date().toISOString().split("T")[0];
+    const usageId = `${clientKey}-${today}`;
+    usageCounters[usageId] = (usageCounters[usageId] || 0) + 1;
+
+    if (quota !== "unlimited" && usageCounters[usageId] > quota) {
+      return res.status(429).json({
+        error: "Quota exceeded",
+        apikey: clientKey,
+        plan,
+        quota,
+        used: usageCounters[usageId]
+      });
+    }
+
+    // Data NSFW (contoh statis)
+    const nsfwList = [
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai1.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai2.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai3.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai4.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai5.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai6.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai8.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai9.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai10.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai11.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai12.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai13.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai14.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai15.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai16.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai17.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai18.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai19.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai20.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/hentai21.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw1.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw2.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw3.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw4.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw5.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw6.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw7.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw8.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw9.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw10.jpg" },
+      { status: true, result: "https://ik.imagekit.io/wamr3naeq/random%20anime/nsfw11.jpg" }
+    ];
+    const randomNSFW = nsfwList[Math.floor(Math.random() * nsfwList.length)];
+
+    return res.status(200).json({
+      category: "Anime NSFW",
+      apikey: clientKey,
+      plan,
+      quota,
+      used: usageCounters[usageId],
+      data: randomNSFW
+    });
+  } catch (err) {
+    console.error("Serverless error:", err);
+    return res.status(500).json({ error: "Internal Server Error", detail: err.message });
+  }
+}
